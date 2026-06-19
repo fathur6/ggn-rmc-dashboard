@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ms" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kursus Research Methodology</title>
+    <!-- Pustaka Luaran -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1e293b; }
+        
+        /* --- REKAAN DASHBOARD --- */
+        .dashboard-wrapper { position: relative; min-height: 100vh; background-color: #f9fafb; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); padding-bottom: 64px; animation: fadeIn 0.3s ease-out forwards; }
+        .dashboard { max-width: 1250px; margin: 0 auto; padding: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 20px; }
+        .header-left { flex: 1; min-width: 350px; display: flex; align-items: center; gap: 20px; }
+        .header-logo-box { height: 60px; width: auto; }
+        .header-logo { height: 100%; width: auto; object-fit: contain; }
+        .header-text h1 { font-size: 22px; font-weight: 800; color: #1e293b; line-height: 1.2; text-transform: uppercase; }
+        .header-text p { font-size: 13px; color: #64748b; margin-top: 2px; }
+        .header-right { flex: 2; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; min-width: 320px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; width: 100%; }
+        .header-actions .btn { flex: 0 1 auto; text-align: center; justify-content: center; padding: 10px 15px; }
+        .last-updated-text { font-size: 11px; color: #94a3b8; font-weight: 600; font-style: italic; width: 100%; text-align: right; min-height: 16px; }
+        
+        .sync-banner { background: #ecfdf5; border: 1px solid #a7f3d0; color: #059669; padding: 12px 20px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .sync-spinner { width: 18px; height: 18px; border: 3px solid #a7f3d0; border-top: 3px solid #059669; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .role-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; }
+        .role-admin { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .role-staff { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+        .stat-card { background: white; border-radius: 16px; padding: 24px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-number { font-size: 36px; font-weight: 800; color: #2563eb; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; justify-content: center;}
+        .chart-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; overflow: hidden; }
+        .chart-container { height: 300px; position: relative; margin: 0 auto; width: 100%; max-width: 400px; }
+
+        .filter-bar { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .filter-group label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 8px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em; }
+        .filter-group input, .filter-group select { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; outline: none; }
+        .filter-grid input:focus { border-color: #2563eb; background: white; }
+
+        .table-container { background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow-x: auto; margin-bottom: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1000px; }
+        th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; font-weight: 700; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.025em; }
+        th:hover { background: #f1f5f9; }
+        
+        th.sortable { cursor: pointer; user-select: none; transition: background 0.2s ease; position: relative; }
+        th.sortable:hover { background: #e2e8f0; color: #1e293b; }
+        .sort-icon { display: inline-block; margin-left: 5px; color: #cbd5e1; font-size: 12px; }
+        .sort-icon.active { color: #2563eb; }
+
+        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: #ca8a04; color: white; }
+        .btn-warning:hover { background: #a16207; }
+        .btn-info { background: #8b5cf6; color: white; }
+        .btn-info:hover { background: #7c3aed; }
+        .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+
+        .badge { padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-emailed { background: #dcfce7; color: #166534; }
+        .badge-test { background: #fef9c3; color: #854d0e; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+        .badge-pending { background: #f1f5f9; color: #475569; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-content { background: white; border-radius: 24px; width: 100%; max-width: 500px; overflow: hidden; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .section-title { border-left: 5px solid #2563eb; padding-left: 15px; font-weight: 800; color: #1e293b; margin: 30px 0 15px; text-transform: uppercase; }
+        .shake { animation: shakeAnim 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shakeAnim { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        .form-label { font-size: 12px; font-weight: 700; color: #64748b; display: block; margin-bottom: 6px; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; }
+        .form-input:focus { border-color: #2563eb; }
+        
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .details-label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+        .details-value { font-size: 14px; font-weight: 600; color: #1e293b; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; word-break: break-word; }
+        
+        .student-cb { width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb; }
+        .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
+        .admin-list-item:last-child { border-bottom: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="notranslate">
+<div id="app"></div>
+<div class="toast-container" id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 3000;"></div>
+
+<!-- Advanced PDF Viewer Modal -->
+<div id="pdfModal" class="modal" style="display: none; padding: 0; background: rgba(0,0,0,0.85); z-index: 5000;">
+    <div class="modal-content" style="max-width: 95%; width: 1100px; height: 95vh; padding: 0; background: #323639; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        
+        <div style="padding: 12px 24px; background: #202124; display: flex; justify-content: space-between; align-items: center; color: white;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <i class="fa-solid fa-file-pdf" style="color: #ea4335; font-size: 20px;"></i>
+                <span id="pdfFileNameDisplay" style="font-weight: 500; font-size: 14px; letter-spacing: 0.5px;">Sijil_Pelajar.pdf</span>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a id="pdfOpenTab" href="#" target="_blank" class="btn" style="background: rgba(255,255,255,0.1); color: white; padding: 6px 15px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i> Buka Tab
+                </a>
+                <a id="pdfDownload" href="#" target="_blank" class="btn" style="background: #2563eb; color: white; padding: 6px 15px; font-size: 12px;">
+                    <i class="fa-solid fa-download mr-2"></i> Muat Turun
+                </a>
+                <button onclick="closePdfModal()" style="background: none; border: none; color: #9aa0a6; font-size: 24px; cursor: pointer; margin-left: 10px; line-height: 1;">×</button>
+            </div>
+        </div>
+
+        <div id="pdfLoadingState" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #323639; color: #e8eaed;">
+            <div class="sync-spinner" style="width: 40px; height: 40px; border-width: 4px; margin-bottom: 15px;"></div>
+            <p style="font-size: 14px; font-weight: 500;">Menarik dokumen dari Google Drive...</p>
+        </div>
+        
+        <iframe id="pdfIframe" style="display: none; width: 100%; flex: 1; border: none;" src=""></iframe>
+    </div>
+</div>
+
+<script>
+// Daftarkan plugin Datalabels secara global
+Chart.register(ChartDataLabels);
+
+let userRole = 'guest'; 
+let userEmail = 'Tidak Dikenali';
+let isLoadingData = false;
+let statusMessage = '';
+let students = [];
+let adminList = [];
+let searchTerm = '';
+let filterStatus = '';
+let charts = {};
+let lastUpdated = null;
+
+let sortColumn = 'no'; 
+let sortAscending = true; 
+
+try {
+    const cachedData = localStorage.getItem('pps_students');
+    if (cachedData) {
+        students = JSON.parse(cachedData) || [];
+    }
+} catch (e) {
+    students = []; 
+}
+
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if(!container) return;
+    const toast = document.createElement('div');
+    toast.style.background = '#1e293b';
+    toast.style.color = 'white';
+    toast.style.padding = '12px 20px';
+    toast.style.borderRadius = '12px';
+    toast.style.marginBottom = '10px';
+    toast.style.fontSize = '14px';
+    toast.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
+    toast.innerHTML = `<span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span> ${message}`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 4000);
+}
+
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' || event.keyCode === 27) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (modal.style.display === 'flex' || modal.style.display === 'block') {
+                modal.style.display = 'none';
+            }
+        });
+    }
+});
+
+function checkGoogleIdentity() {
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                if (result.success) {
+                    userRole = result.role;
+                    userEmail = result.email;
+                    render();
+                    if (userRole === 'admin') {
+                        showNotification('Akses Pentadbir disahkan secara terbina (' + userEmail + ').', 'success');
+                    } else {
+                        showNotification('Akses Hanya Baca UniSZA disahkan (' + userEmail + ').', 'info');
+                    }
+                }
+            })
+            .withFailureHandler(function(err) {
+                showNotification('Gagal membuat verifikasi SSO Google.', 'error');
+            })
+            .verifyUserAccess();
+    } else {
+        userRole = 'admin';
+        userEmail = 'staf@unisza.edu.my';
+        showNotification('Akses Pentadbir disimulasikan (Local Preview).', 'success');
+        render();
+    }
+}
+
+window.requireAdmin = (actionFunction) => {
+    if (userRole === 'admin') {
+        if (actionFunction) actionFunction();
+    } else {
+        showNotification('Tindakan ini memerlukan kebenaran Akses Pentadbir PPS. E-mel anda: ' + userEmail, 'error');
+    }
+};
+
+async function fetchDataFromSheet() {
+    isLoadingData = true; 
+    statusMessage = "Sedang menyegerak data dari spreadsheet...";
+    render(); 
+    
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler(function(data) {
+                students = data || [];
+                lastUpdated = new Date();
+                try {
+                    localStorage.setItem('pps_students', JSON.stringify(students));
+                } catch(e) {}
+                showNotification('Data berjaya disegerak dari spreadsheet.', 'success');
+                isLoadingData = false; 
+                render();
+            })
+            .withFailureHandler(function(err) {
+                showNotification('Gagal mengambil data: ' + err.message, 'error');
+                isLoadingData = false; 
+                render();
+            })
+            .getStudentsData();
+    } else {
+        setTimeout(() => {
+            loadMockData();
+            isLoadingData = false;
+            render();
+        }, 800);
+    }
+}
+
+function loadMockData() {
+    students = [
+        { "no": "Test1", "matric": "A/0888", "nama": "NUR QURRATU AINI JANNAH BINTI NASARUDDIN", "emel": "pelajar@test.com", "rmcSession": "Semester II Session 2025/2026", "certId": "RMC26-001", "status": "Test Emailed", "category": "SCIENCE", "examMarks": "30", "assignMarks": "42", "totalMarks": "72", "statusSijil": "Lulus", "faculty": "FBIM", "supervisor": "DR. AHMAD NAORAS BITAR", "gradCoord": "DR. NUR FATIN HANNANI BINTI IMRAN", "facultyPic": "DR. FAIRUZ BINTI MOHD NASIR" }
+    ];
+    lastUpdated = new Date();
+}
+
+function triggerCertificateProcess(mode, selectedMatrics = []) {
+    const isTest = mode === 'test';
+    
+    Swal.fire({
+        title: isTest ? 'Sedang Menjana Sijil (Ujian)...' : 'Sedang Menjana Sijil Sebenar...',
+        text: 'Proses ini mungkin mengambil sedikit masa. Sila tunggu dan jangan tutup tetingkap ini.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    if (typeof google !== 'undefined' && google.script) {
+        const withSuccess = function(response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Selesai!',
+                text: `Berjaya dihantar: ${response.success} | Ralat: ${response.error}`
+            });
+            fetchDataFromSheet();
+        };
+        const withFailure = function(err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ralat Berlaku',
+                text: err.message || 'Sistem gagal menghubungi pelayan.'
+            });
+        };
+        
+        if (isTest) {
+            google.script.run.withSuccessHandler(withSuccess).withFailureHandler(withFailure).runTestModeWeb();
+        } else {
+            google.script.run.withSuccessHandler(withSuccess).withFailureHandler(withFailure).runActualModeWeb(selectedMatrics);
+        }
+    } else {
+         setTimeout(() => {
+             Swal.fire({
+                icon: 'success',
+                title: 'Simulasi Selesai!',
+                text: `[Mod ${mode.toUpperCase()}] Sijil berjaya diproses (Local Preview).`
+             });
+             if(mode === 'actual' && selectedMatrics.length > 0) {
+                 selectedMatrics.forEach(m => {
+                     let s = students.find(x => x.matric === m);
+                     if(s) s.status = 'Emailed';
+                 });
+                 try {
+                     localStorage.setItem('pps_students', JSON.stringify(students));
+                 } catch(e) {}
+             }
+             render();
+         }, 2000);
+    }
+}
+
+window.openAdminModal = () => {
+    document.getElementById('adminModal').style.display = 'flex';
+    document.getElementById('adminListArea').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Memuat turun senarai admin...</div>';
+    
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler(function(list) {
+                adminList = list;
+                renderAdminListHtml();
+            })
+            .withFailureHandler(function(err) {
+                document.getElementById('adminListArea').innerHTML = '<div style="color:red; text-align:center; padding:10px;">Gagal: ' + err.message + '</div>';
+            })
+            .getAdminsWeb();
+    } else {
+        adminList = ['admin@unisza.edu.my', 'pps_gs-academic@unisza.edu.my'];
+        setTimeout(renderAdminListHtml, 500);
+    }
+};
+
+window.renderAdminListHtml = () => {
+    let html = '';
+    adminList.forEach(email => {
+        html += `
+        <div class="admin-list-item">
+            <span style="font-weight:600; color:#1e293b;">${escapeHtml(email)}</span>
+            <button class="btn btn-danger" style="padding: 5px 10px; font-size:11px;" onclick="removeAdminAction('${escapeHtml(email)}')"><i class="fa-solid fa-trash"></i> Buang</button>
+        </div>`;
+    });
+    document.getElementById('adminListArea').innerHTML = html;
+};
+
+window.addAdminAction = () => {
+    const newEmail = document.getElementById('newAdminEmail').value.trim();
+    if (!newEmail) return;
+    
+    document.getElementById('adminListArea').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Menambah admin...</div>';
+    
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler(function(list) {
+                adminList = list;
+                document.getElementById('newAdminEmail').value = '';
+                renderAdminListHtml();
+                showNotification('Pentadbir baharu berjaya ditambah.', 'success');
+            })
+            .withFailureHandler(function(err) {
+                showNotification(err.message, 'error');
+                renderAdminListHtml();
+            })
+            .addAdminWeb(newEmail);
+    } else {
+        adminList.push(newEmail);
+        document.getElementById('newAdminEmail').value = '';
+        renderAdminListHtml();
+    }
+};
+
+window.removeAdminAction = (email) => {
+    if(!confirm(`Adakah anda pasti mahu membuang ${email} dari senarai pentadbir?`)) return;
+    
+    document.getElementById('adminListArea').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Membuang admin...</div>';
+    
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler(function(list) {
+                adminList = list;
+                renderAdminListHtml();
+                showNotification('Pentadbir berjaya dibuang.', 'success');
+            })
+            .withFailureHandler(function(err) {
+                showNotification(err.message, 'error');
+                renderAdminListHtml();
+            })
+            .removeAdminWeb(email);
+    } else {
+        adminList = adminList.filter(e => e !== email);
+        renderAdminListHtml();
+    }
+};
+
+window.openDetailsModal = (matricVal) => {
+    const student = students.find(s => s.matric === matricVal);
+    if(!student) return;
+    
+    document.getElementById('detailsModal').style.display = 'flex';
+    document.getElementById('detNama').innerText = student.nama || '-';
+    document.getElementById('detMatric').innerText = student.matric || '-';
+    document.getElementById('detEmel').innerText = student.emel || '-';
+    document.getElementById('detCategory').innerText = student.category || '-';
+    document.getElementById('detExam').innerText = student.examMarks || '-';
+    document.getElementById('detAssign').innerText = student.assignMarks || '-';
+    document.getElementById('detTotal').innerText = student.totalMarks || '-';
+    document.getElementById('detStatusSijil').innerText = student.statusSijil || '-';
+    document.getElementById('detCertId').innerText = student.certId || '-';
+    document.getElementById('detStatusEmail').innerText = student.status || 'Belum Diemel';
+    document.getElementById('detRmcSession').innerText = student.rmcSession || '-';
+    document.getElementById('detFaculty').innerText = student.faculty || '-';
+    document.getElementById('detSupervisor').innerText = student.supervisor || '-';
+    document.getElementById('detGradCoord').innerText = student.gradCoord || '-';
+    document.getElementById('detFacultyPic').innerText = student.facultyPic || '-';
+
+    const actionContainer = document.getElementById('detActionContainer');
+    if (student.statusSijil && student.statusSijil.toLowerCase() === 'lulus') {
+        actionContainer.innerHTML = `
+            <div class="details-label">TINDAKAN SIJIL</div>
+            <div class="details-value" style="border:none; padding-bottom:0; padding-top:2px;">
+                <button class="btn btn-info" style="padding: 6px 12px; font-size:12px; background-color: #10b981; border: none;" onclick="openPdfModal('${escapeHtml(student.matric)}')">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Papar Sijil
+                </button>
+            </div>
+        `;
+    } else {
+        actionContainer.innerHTML = '';
+    }
+};
+
+window.openEditModal = (matricVal) => {
+    const student = students.find(s => s.matric === matricVal);
+    if(!student) return;
+    
+    document.getElementById('editModal').style.display = 'flex';
+    document.getElementById('editOriginalMatric').value = student.matric;
+    document.getElementById('editMatric').value = student.matric;
+    document.getElementById('editNama').value = student.nama;
+    document.getElementById('editEmel').value = student.emel;
+    document.getElementById('editCertId').value = student.certId;
+    document.getElementById('editRmcSession').value = student.rmcSession || '';
+    document.getElementById('editStatus').value = student.status;
+    document.getElementById('editFaculty').value = student.faculty || '';
+    
+    document.getElementById('editModalBtns').classList.remove('hidden');
+    document.getElementById('editModalLoading').style.display = 'none';
+};
+
+window.saveEditData = async () => {
+    const originalMatric = document.getElementById('editOriginalMatric').value;
+    const studentIndex = students.findIndex(s => s.matric === originalMatric);
+    if(studentIndex === -1) return;
+
+    const updatedData = {
+        originalMatric: originalMatric,
+        matric: document.getElementById('editMatric').value,
+        nama: document.getElementById('editNama').value,
+        emel: document.getElementById('editEmel').value,
+        certId: document.getElementById('editCertId').value,
+        rmcSession: document.getElementById('editRmcSession').value,
+        faculty: document.getElementById('editFaculty').value,
+        status: document.getElementById('editStatus').value
+    };
+
+    document.getElementById('editModalBtns').classList.add('hidden');
+    document.getElementById('editModalLoading').style.display = 'block';
+
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                showNotification('Rekod berjaya dikemaskini dalam spreadsheet.', 'success');
+                students[studentIndex] = Object.assign(students[studentIndex], updatedData);
+                try {
+                    localStorage.setItem('pps_students', JSON.stringify(students));
+                } catch(e) {}
+                document.getElementById('editModal').style.display = 'none';
+                render();
+            })
+            .withFailureHandler(function(err) {
+                showNotification('Ralat sistem: ' + err.message, 'error');
+                document.getElementById('editModalBtns').classList.remove('hidden');
+                document.getElementById('editModalLoading').style.display = 'none';
+            })
+            .updateStudentWeb(updatedData);
+    } else {
+        setTimeout(() => {
+            students[studentIndex] = Object.assign(students[studentIndex], updatedData);
+            try {
+                localStorage.setItem('pps_students', JSON.stringify(students));
+            } catch(e) {}
+            document.getElementById('editModal').style.display = 'none';
+            showNotification('Rekod berjaya dikemaskini (Simulasi).', 'success');
+            render();
+        }, 1000);
+    }
+};
+
+function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function getStatusCategory(statusStr) {
+    if(!statusStr) return 'Pending';
+    const s = statusStr.toLowerCase();
+    if(s === 'emailed') return 'Emailed';
+    if(s === 'test emailed') return 'Emel Ujian';
+    if(s.includes('error')) return 'Error';
+    return 'Pending';
+}
+
+function getStatusBadgeHtml(cat, tooltip = '') {
+    if(cat === 'Emailed') return `<span class="badge badge-emailed"><i class="fa-solid fa-check mr-1"></i> Selesai Emel</span>`;
+    if(cat === 'Emel Ujian') return `<span class="badge badge-test"><i class="fa-solid fa-vial mr-1"></i> Emel Ujian</span>`;
+    if(cat === 'Error') return `<span class="badge badge-error" title="${escapeHtml(tooltip)}"><i class="fa-solid fa-circle-exclamation mr-1"></i> Ralat</span>`;
+    return `<span class="badge badge-pending">Belum Diemel</span>`;
+}
+
+function renderCharts() {
+    if(!students || students.length === 0) return;
+
+    const statusCounts = { 'Selesai Emel': 0, 'Emel Ujian': 0, 'Belum Diemel': 0, 'Ralat': 0 };
+    students.forEach(s => {
+        const cat = getStatusCategory(s.status);
+        if (cat === 'Emailed') statusCounts['Selesai Emel']++;
+        else if (cat === 'Emel Ujian') statusCounts['Emel Ujian']++;
+        else if (cat === 'Error') statusCounts['Ralat']++;
+        else statusCounts['Belum Diemel']++;
+    });
+
+    const ctxStatus = document.getElementById('statusChart')?.getContext('2d');
+    if (ctxStatus) {
+        if (charts.status) charts.status.destroy();
+        charts.status = new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: { 
+                labels: Object.keys(statusCounts), 
+                datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#22c55e', '#eab308', '#cbd5e1', '#ef4444'], borderWeight: 0 }] 
+            },
+            options: { 
+                responsive: true, maintainAspectRatio: false, cutout: '65%', 
+                plugins: { legend: { position: 'bottom' }, datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (value) => value > 0 ? value : '' } } 
+            }
+        });
+    }
+}
+
+window.handleSort = (column) => {
+    if (sortColumn === column) {
+        sortAscending = !sortAscending; 
+    } else {
+        sortColumn = column;
+        sortAscending = true; 
+    }
+    render();
+};
+
+function getSortIconHtml(column) {
+    if (sortColumn !== column) {
+        return '<i class="fa-solid fa-sort sort-icon"></i>';
+    }
+    return sortAscending 
+        ? '<i class="fa-solid fa-sort-up sort-icon active"></i>' 
+        : '<i class="fa-solid fa-sort-down sort-icon active"></i>';
+}
+
+function render() {
+    const app = document.getElementById('app');
+    const scrollPos = window.scrollY || document.documentElement.scrollTop;
+    const safeStudents = students || [];
+
+    let filtered = safeStudents.filter(l => {
+        const matchesSearch = !searchTerm || (l.nama||'').toLowerCase().includes(searchTerm) || (l.emel||'').toLowerCase().includes(searchTerm) || (l.matric||'').toLowerCase().includes(searchTerm);
+        const cat = getStatusCategory(l.status);
+        return matchesSearch && (!filterStatus || cat === filterStatus);
+    });
+
+    filtered.sort((a, b) => {
+        if (!a || !b) return 0;
+        let valA = (a[sortColumn] || '').toString().toLowerCase();
+        let valB = (b[sortColumn] || '').toString().toLowerCase();
+
+        if (sortColumn === 'no') {
+            let numA = parseFloat(valA);
+            let numB = parseFloat(valB);
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return sortAscending ? numA - numB : numB - numA;
+            }
+        }
+
+        if (valA < valB) return sortAscending ? -1 : 1;
+        if (valA > valB) return sortAscending ? 1 : -1;
+        return 0;
+    });
+
+    const totalStudents = safeStudents.length;
+    let totalEmailed = 0, totalPending = 0, totalError = 0;
+    safeStudents.forEach(s => {
+        const cat = getStatusCategory(s.status);
+        if(cat === 'Emailed' || cat === 'Emel Ujian') totalEmailed++;
+        else if(cat === 'Error') totalError++;
+        else totalPending++;
+    });
+
+    const isAdminUser = (userRole === 'admin');
+
+    app.innerHTML = `
+        <div class="dashboard-wrapper">
+            <div class="dashboard">
+                <div class="header">
+                    <div class="header-left">
+                        <div class="header-logo-box"><img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" alt="Logo" class="header-logo"></div>
+                        <div class="header-text">
+                            <h1>Kursus Research Methodology</h1>
+                            <p>Maklumat Siswazah dan Status Sijil</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <div class="role-badge ${isAdminUser ? 'role-admin' : 'role-staff'}">
+                            <i class="fa-solid ${isAdminUser ? 'fa-shield-halved' : 'fa-lock'}"></i> 
+                            Akses: ${isAdminUser ? 'Pentadbir' : 'Hanya Baca'}
+                        </div>
+                        <div style="font-size:11px; color:#475569; font-weight:600; margin-top:2px;">
+                            Sesi: <span class="text-blue-600">${userEmail}</span>
+                        </div>
+                        
+                        <div class="header-actions" style="margin-top:8px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; align-items: stretch; max-width: 100%;">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                                    <button class="btn btn-secondary" onclick="fetchDataFromSheet()"><i class="fa-solid fa-rotate"></i> Sync Data</button>
+                                    ${isAdminUser ? `
+                                        <button class="btn btn-warning" onclick="requireAdmin(() => openConfirmModal('test'))"><i class="fa-solid fa-flask"></i> Mod Ujian</button>
+                                        <button class="btn btn-primary" onclick="requireAdmin(() => openSelectStudentsModal())"><i class="fa-solid fa-paper-plane"></i> Mod Sebenar</button>
+                                        <button class="btn btn-info" onclick="requireAdmin(() => window.open('https://docs.google.com/document/d/1gRxiBT8Z_6gtvyB5dwui4iQlznFMsOh1sfOkbcvO05k/edit?usp=drive_link', '_blank'))"><i class="fa-solid fa-certificate"></i> Template Sijil</button>
+                                        <button class="btn btn-secondary" onclick="requireAdmin(() => openAdminModal())"><i class="fa-solid fa-users-gear"></i> Urus Admin</button>
+                                    ` : ''}
+                                </div>
+                                <button class="btn btn-success" onclick="downloadPDF()"><i class="fa-solid fa-file-pdf"></i> PDF Laporan</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                ${isLoadingData ? `<div class="sync-banner"><div class="sync-spinner"></div><span>${statusMessage}</span></div>` : ''}
+
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-number">${totalStudents}</div><div style="font-weight:700; color:#64748b; margin-top:5px;">JUMLAH PELAJAR</div></div>
+                    <div class="stat-card"><div class="stat-number" style="color:#22c55e">${totalEmailed}</div><div style="font-weight:700; color:#64748b; margin-top:5px;">BERJAYA DIEMEL</div></div>
+                    <div class="stat-card"><div class="stat-number" style="color:#eab308">${totalPending}</div><div style="font-weight:700; color:#64748b; margin-top:5px;">BELUM DIEMEL</div></div>
+                    <div class="stat-card"><div class="stat-number" style="color:#ef4444">${totalError}</div><div style="font-weight:700; color:#64748b; margin-top:5px;">RALAT</div></div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3 style="font-weight:800; color:#1e293b; margin-bottom:15px;"><i class="fa-solid fa-chart-pie mr-2"></i> TABURAN STATUS EMEL</h3>
+                        <div class="chart-container"><canvas id="statusChart"></canvas></div>
+                        <div class="last-updated-text" style="margin-top: 15px;">
+                            ${lastUpdated ? 'Terkini: ' + lastUpdated.toLocaleString('ms-MY', { hour12: true, dateStyle: 'short', timeStyle: 'short' }) : 'Sedia untuk disegerak...'}
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Rekod Maklumat Pelajar</h2>
+                <div class="filter-bar">
+                    <div class="filter-grid">
+                        <div class="filter-group"><label>Carian Nama / Matrik</label>
+                            <div style="display:flex; gap:8px">
+                                <input type="text" id="searchInput" placeholder="Taip nama atau no matrik..." value="${searchTerm}" onkeypress="if(event.key==='Enter') executeSearch()">
+                                <button class="btn btn-primary" onclick="executeSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                            </div>
+                        </div>
+                        <div class="filter-group"><label>Saring Status</label>
+                            <select id="filterStatusSelect" onchange="updateFilters()">
+                                <option value="">Semua Status</option>
+                                <option value="Emailed" ${filterStatus==='Emailed'?'selected':''}>Selesai Emel</option>
+                                <option value="Emel Ujian" ${filterStatus==='Emel Ujian'?'selected':''}>Emel Ujian</option>
+                                <option value="Pending" ${filterStatus==='Pending'?'selected':''}>Belum Diemel (Pending)</option>
+                                <option value="Error" ${filterStatus==='Error'?'selected':''}>Ralat (Error)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container" id="reportArea">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="sortable" onclick="handleSort('no')">Bil ${getSortIconHtml('no')}</th>
+                                <th class="sortable" onclick="handleSort('matric')">No Matrik ${getSortIconHtml('matric')}</th>
+                                <th class="sortable" onclick="handleSort('nama')">Nama Pelajar (Klik untuk info) ${getSortIconHtml('nama')}</th>
+                                <th class="sortable" onclick="handleSort('emel')">Emel ${getSortIconHtml('emel')}</th>
+                                <th class="sortable" onclick="handleSort('rmcSession')">Sesi RMC ${getSortIconHtml('rmcSession')}</th>
+                                <th class="sortable" onclick="handleSort('certId')">No Sijil ${getSortIconHtml('certId')}</th>
+                                <th class="sortable" onclick="handleSort('status')">Status ${getSortIconHtml('status')}</th>
+                                <th style="text-align:center">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody>${filtered.length ? filtered.map((l,i)=>`
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td>${escapeHtml(l.no)}</td>
+                                <td style="font-family: monospace; color:#64748b;">${escapeHtml(l.matric)}</td>
+                                <td><a href="#" onclick="openDetailsModal('${escapeHtml(l.matric)}'); return false;" style="color:#2563eb; text-decoration:none; font-weight:700;">${escapeHtml(l.nama)}</a></td>
+                                <td><a href="mailto:${escapeHtml(l.emel)}" style="color:#64748b; text-decoration:none;">${escapeHtml(l.emel)}</a></td>
+                                <td><span style="color:#1e293b; font-size:12px; font-weight:500;">${escapeHtml(l.rmcSession || '-')}</span></td>
+                                <td><span style="color:#64748b; font-family: monospace;">${escapeHtml(l.certId)}</span></td>
+                                <td>${getStatusBadgeHtml(getStatusCategory(l.status), l.status)}</td>
+                                <td style="text-align:center">
+                                    ${isAdminUser ? `
+                                        <button class="btn btn-secondary" style="padding: 6px 12px" onclick="requireAdmin(() => openEditModal('${escapeHtml(l.matric)}'))"><i class="fa-solid fa-pen"></i></button>
+                                    ` : `
+                                        <span style="color:#94a3b8; font-size:11px; font-weight:600;"><i class="fa-solid fa-lock mr-1"></i> Hanya Baca</span>
+                                    `}
+                                </td>
+                            </tr>`).join('') : '<tr><td colspan="8" style="text-align:center; padding:40px; color:#94a3b8">Tiada rekod dijumpai.</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="adminModal" class="modal">
+            <div class="modal-content" style="max-width: 500px; padding: 0; background: #ffffff;">
+                <div style="padding: 24px 32px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;"><i class="fa-solid fa-users-gear mr-2 text-blue-600"></i> Urus Pentadbir Sistem</h3>
+                    <button onclick="document.getElementById('adminModal').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div style="padding: 20px 32px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                    <label class="form-label">TAMBAH EMEL PENTADBIR BAHARU</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="email" id="newAdminEmail" class="form-input" style="margin-bottom:0;" placeholder="Contoh: staf@unisza.edu.my">
+                        <button class="btn btn-primary" onclick="addAdminAction()">Tambah</button>
+                    </div>
+                </div>
+                <div style="padding: 0; max-height: 40vh; overflow-y: auto;">
+                    <div id="adminListArea"></div>
+                </div>
+                <div style="border-top: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: flex-end; background: #f8fafc;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('adminModal').style.display='none'">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="detailsModal" class="modal">
+            <div class="modal-content" style="max-width: 650px; padding: 0; background: #ffffff;">
+                <div style="padding: 24px 32px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;"><i class="fa-solid fa-address-card mr-2 text-blue-600"></i> Maklumat Lengkap Pelajar</h3>
+                    <button onclick="document.getElementById('detailsModal').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div style="padding: 24px 32px; max-height: 65vh; overflow-y: auto;">
+                    <div class="details-grid">
+                        <div><div class="details-label">NAMA PELAJAR</div><div id="detNama" class="details-value"></div></div>
+                        <div><div class="details-label">NO MATRIK</div><div id="detMatric" class="details-value"></div></div>
+                        <div><div class="details-label">EMEL</div><div id="detEmel" class="details-value"></div></div>
+                        <div><div class="details-label">KATEGORI</div><div id="detCategory" class="details-value"></div></div>
+                        <div><div class="details-label">MARKAH PEPERIKSAAN (40%)</div><div id="detExam" class="details-value"></div></div>
+                        <div><div class="details-label">MARKAH TUGASAN (60%)</div><div id="detAssign" class="details-value"></div></div>
+                        <div><div class="details-label">JUMLAH MARKAH (100%)</div><div id="detTotal" class="details-value"></div></div>
+                        <div><div class="details-label">STATUS SIJIL</div><div id="detStatusSijil" class="details-value"></div></div>
+                        <div><div class="details-label">NO SIJIL (CERT ID)</div><div id="detCertId" class="details-value"></div></div>
+                        <div><div class="details-label">STATUS PENGHANTARAN EMEL</div><div id="detStatusEmail" class="details-value"></div></div>
+                        <div><div class="details-label">SESI RMC</div><div id="detRmcSession" class="details-value"></div></div>
+                        <div><div class="details-label">FAKULTI</div><div id="detFaculty" class="details-value"></div></div>
+                        <div><div class="details-label">PENYELIA UTAMA</div><div id="detSupervisor" class="details-value"></div></div>
+                        <div><div class="details-label">PENYELARAS SISWAZAH</div><div id="detGradCoord" class="details-value"></div></div>
+                        <div><div class="details-label">PIC FAKULTI</div><div id="detFacultyPic" class="details-value"></div></div>
+                        <div id="detActionContainer"></div>
+                    </div>
+                </div>
+                <div style="border-top: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: flex-end; background: #f8fafc;"><button class="btn btn-secondary" onclick="document.getElementById('detailsModal').style.display='none'">Tutup</button></div>
+            </div>
+        </div>
+
+        <div id="selectStudentsModal" class="modal">
+            <div class="modal-content" style="max-width: 750px; padding: 0; background: #ffffff;">
+                <div style="padding: 24px 32px 16px; border-bottom: 1px solid #e2e8f0;">
+                    <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">🚀 Mod Sebenar: Pilih Pelajar</h3>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 5px; margin-bottom: 15px;">Hanya pelajar pending tersenarai.</p>
+                    <div style="position: relative; width: 100%;">
+                        <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                        <input type="text" id="modalSearchInput" placeholder="Cari nama atau no matrik..." onkeyup="filterModalTable()" class="form-input" style="margin-bottom: 0; padding-left: 36px; border-color: #cbd5e1;">
+                    </div>
+                </div>
+                <div style="padding: 0 32px; max-height: 45vh; overflow-y: auto;">
+                    <table style="width:100%; border-collapse: collapse; font-size:13px;">
+                        <thead style="position: sticky; top: 0; background: white; z-index: 1;">
+                            <tr>
+                                <th style="padding:10px; border-bottom:2px solid #e2e8f0; text-align:center;"><input type="checkbox" id="selectAllCb" class="student-cb" onclick="toggleSelectAll()"></th>
+                                <th style="padding:10px; border-bottom:2px solid #e2e8f0; text-align:left;">No Matrik</th>
+                                <th style="padding:10px; border-bottom:2px solid #e2e8f0; text-align:left;">Nama</th>
+                                <th style="padding:10px; border-bottom:2px solid #e2e8f0; text-align:left;">Status Semasa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentSelectList"></tbody>
+                    </table>
+                </div>
+                <div style="border-top: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+                    <span id="selectedCountText" style="font-size: 14px; font-weight: 600; color: #2563eb;">0 pelajar dipilih</span>
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('selectStudentsModal').style.display='none'">Batal</button>
+                        <button class="btn btn-primary" onclick="triggerActualProcess()">Hantar Emel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="confirmModal" class="modal">
+            <div class="modal-content" style="max-width: 500px; padding: 0; background: #ffffff;">
+                <div style="padding: 24px 32px 16px;">
+                    <h3 id="confirmTitle" style="font-size: 20px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"></h3>
+                    <p id="confirmDesc" style="font-size: 14px; color: #64748b; line-height: 1.5;"></p>
+                </div>
+                <div style="border-top: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: flex-end; gap: 12px; background: #ffffff;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('confirmModal').style.display='none'">Batal</button>
+                    <button id="confirmBtnAction" class="btn btn-primary">Teruskan</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="editModal" class="modal">
+            <div class="modal-content" style="max-width: 500px; padding: 0; background: #ffffff;">
+                <div style="padding: 24px 32px 16px; border-bottom: 1px solid #e2e8f0;">
+                    <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">✏️ Kemaskini Rekod Pelajar</h3>
+                </div>
+                <div style="padding: 24px 32px;">
+                    <input type="hidden" id="editOriginalMatric">
+                    <label class="form-label">NO MATRIK</label><input type="text" id="editMatric" class="form-input">
+                    <label class="form-label">NAMA PELAJAR</label><input type="text" id="editNama" class="form-input">
+                    <label class="form-label">EMEL</label><input type="email" id="editEmel" class="form-input">
+                    <label class="form-label">SESI RMC</label><input type="text" id="editRmcSession" class="form-input">
+                    <label class="form-label">FAKULTI</label><input type="text" id="editFaculty" class="form-input">
+                    <label class="form-label">NO SIJIL</label><input type="text" id="editCertId" class="form-input">
+                    <label class="form-label">STATUS</label><input type="text" id="editStatus" class="form-input">
+                    <div id="editModalLoading" style="display:none; text-align:center; padding:15px 0;"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600 mb-2"></i><p>Menyimpan rekod...</p></div>
+                    <div id="editModalBtns" style="display:flex; gap:12px; margin-top: 10px;">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('editModal').style.display='none'">Batal</button>
+                        <button class="btn btn-primary" style="flex:1;" onclick="saveEditData()">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    window.scrollTo(0, scrollPos);
+    setTimeout(() => { renderCharts(); }, 100);
+}
+
+window.executeSearch = () => { searchTerm = document.getElementById('searchInput').value.toLowerCase(); render(); };
+window.updateFilters = () => { filterStatus = document.getElementById('filterStatusSelect').value; render(); };
+
+window.filterModalTable = () => {
+    const input = document.getElementById('modalSearchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#studentSelectList tr');
+    rows.forEach(row => {
+        const matric = row.cells[1] ? row.cells[1].innerText.toLowerCase() : '';
+        const name = row.cells[2] ? row.cells[2].innerText.toLowerCase() : '';
+        row.style.display = (matric.includes(input) || name.includes(input)) ? '' : 'none';
+    });
+    document.getElementById('selectAllCb').checked = false;
+};
+
+window.openSelectStudentsModal = () => {
+    const listContainer = document.getElementById('studentSelectList');
+    listContainer.innerHTML = '';
+    const searchInput = document.getElementById('modalSearchInput');
+    if (searchInput) searchInput.value = '';
+    
+    const pendingStudents = students.filter(s => {
+        return !(s.no||'').toLowerCase().startsWith('test') && (s.status||'').trim().toLowerCase() !== 'emailed';
+    });
+
+    if(pendingStudents.length === 0) {
+        listContainer.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8;">🎉 Semua pelajar sedia ada telah menerima sijil.</td></tr>';
+    } else {
+        pendingStudents.forEach(s => {
+            listContainer.innerHTML += `
+                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                    <td style="padding:10px; text-align:center;"><input type="checkbox" class="student-cb" value="${escapeHtml(s.matric)}" onchange="updateSelectedCount()"></td>
+                    <td style="padding:10px; font-family:monospace; color:#64748b;">${escapeHtml(s.matric)}</td>
+                    <td style="padding:10px; font-weight:600; color:#1e293b;">${escapeHtml(s.nama)}</td>
+                    <td style="padding:10px;">${getStatusBadgeHtml(getStatusCategory(s.status), s.status)}</td>
+                </tr>
+            `;
+        });
+    }
+    document.getElementById('selectAllCb').checked = false;
+    updateSelectedCount();
+    document.getElementById('selectStudentsModal').style.display = 'flex';
+};
+
+window.toggleSelectAll = () => {
+    const selectAll = document.getElementById('selectAllCb').checked;
+    const cbs = document.querySelectorAll('.student-cb:not(#selectAllCb)');
+    cbs.forEach(cb => {
+        const row = cb.closest('tr');
+        if (row && row.style.display !== 'none') cb.checked = selectAll;
+    });
+    updateSelectedCount();
+};
+
+window.updateSelectedCount = () => {
+    const count = document.querySelectorAll('.student-cb:not(#selectAllCb):checked').length;
+    document.getElementById('selectedCountText').innerText = `${count} pelajar dipilih`;
+};
+
+window.triggerActualProcess = () => {
+    const selectedMatrics = Array.from(document.querySelectorAll('.student-cb:not(#selectAllCb):checked')).map(cb => cb.value);
+    if (selectedMatrics.length === 0) {
+        showNotification('Sila pilih sekurang-kurangnya seorang pelajar.', 'error');
+        return;
+    }
+    document.getElementById('selectStudentsModal').style.display = 'none';
+    triggerCertificateProcess('actual', selectedMatrics);
+};
+
+window.openConfirmModal = (mode) => {
+    if (mode === 'test') {
+        document.getElementById('confirmModal').style.display = 'flex';
+        const title = document.getElementById('confirmTitle');
+        const desc = document.getElementById('confirmDesc');
+        const btn = document.getElementById('confirmBtnAction');
+        title.innerHTML = '🧪 Laksana "Mod Ujian" ?';
+        desc.innerText = 'Memproses baris "Test" sahaja.';
+        btn.className = 'btn btn-warning';
+        btn.onclick = () => triggerCertificateProcess('test');
+    }
+};
+
+window.downloadPDF = () => {
+    const element = document.querySelector('.dashboard');
+    const actions = document.querySelector('.header-actions');
+    const tableActions = document.querySelectorAll('td:last-child, th:last-child');
+    actions.style.display = 'none';
+    tableActions.forEach(el => el.style.display = 'none');
+    
+    html2pdf().set({
+        margin: [0.3, 0.3], filename: `Laporan_Kursus_RM_${new Date().getTime()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' }
+    }).from(element).save().then(() => {
+        actions.style.display = 'flex';
+        tableActions.forEach(el => el.style.display = '');
+        showNotification('Laporan PDF berjaya dimuat turun.', 'success');
+    });
+};
+
+// --- PDF VIEW LOGIC ---
+window.openPdfModal = (matric) => {
+    const modal = document.getElementById('pdfModal');
+    const iframe = document.getElementById('pdfIframe');
+    const loading = document.getElementById('pdfLoadingState');
+    const fileName = document.getElementById('pdfFileNameDisplay');
+    const openTabBtn = document.getElementById('pdfOpenTab');
+    const downloadBtn = document.getElementById('pdfDownload');
+    
+    const safeMatric = matric.toString().replace(/[^a-zA-Z0-9]/g, '');
+    
+    fileName.innerText = safeMatric + ".pdf";
+    modal.style.display = 'flex';
+    loading.style.display = 'flex';
+    iframe.style.display = 'none';
+    
+    loading.innerHTML = `
+        <div class="sync-spinner" style="width: 40px; height: 40px; border-width: 4px; margin-bottom: 15px;"></div>
+        <p style="font-size: 14px; font-weight: 500;">Menarik dokumen dari Google Drive...</p>
+    `;
+    
+    if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+            .withSuccessHandler((fileId) => {
+                if (fileId) {
+                    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+                    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    const fullViewUrl = `https://drive.google.com/file/d/${fileId}/view`;
+                    
+                    iframe.src = previewUrl;
+                    openTabBtn.href = fullViewUrl;
+                    downloadBtn.href = downloadUrl;
+                    
+                    iframe.onload = () => {
+                        loading.style.display = 'none';
+                        iframe.style.display = 'block';
+                    };
+                } else {
+                    loading.innerHTML = `
+                        <i class="fa-solid fa-circle-exclamation" style="font-size: 48px; color: #f28b82; margin-bottom: 15px;"></i>
+                        <p style="color: #f28b82; font-weight: 600;">Fail tidak dijumpai!</p>
+                        <p style="font-size: 12px; margin-top: 5px;">Sijil untuk matrik <b>${safeMatric}</b> belum dijana atau tiada di dalam folder.</p>
+                        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="closePdfModal()">Tutup</button>
+                    `;
+                }
+            })
+            .withFailureHandler((err) => {
+                loading.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 48px; color: #f28b82; margin-bottom: 15px;"></i>
+                    <p style="color: #f28b82; font-weight: 600;">Ralat Pelayan Google</p>
+                    <p style="font-size: 12px; margin-top: 5px;">${err.message}</p>
+                    <button class="btn btn-secondary" style="margin-top: 20px;" onclick="closePdfModal()">Tutup</button>
+                `;
+            })
+            .getStudentPdfId(matric);
+    } else {
+        setTimeout(() => {
+            loading.innerHTML = `
+                <i class="fa-solid fa-laptop-code" style="font-size: 48px; color: #94a3b8; margin-bottom: 15px;"></i>
+                <p style="color: #94a3b8; font-weight: 600;">Mod Simulasi (Local Preview)</p>
+                <p style="font-size: 12px; margin-top: 5px;">Pemapar PDF hanya akan berfungsi sepenuhnya di Google Sites/Apps Script.</p>
+                <button class="btn btn-secondary" style="margin-top: 20px;" onclick="closePdfModal()">Tutup</button>
+            `;
+        }, 1000);
+    }
+};
+
+window.closePdfModal = () => {
+    document.getElementById('pdfModal').style.display = 'none';
+    document.getElementById('pdfIframe').src = "";
+};
+
+render();
+checkGoogleIdentity();
+fetchDataFromSheet();
+</script>
+</body>
+</html>
