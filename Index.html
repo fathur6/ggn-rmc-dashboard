@@ -89,8 +89,6 @@
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .section-title { border-left: 5px solid #2563eb; padding-left: 15px; font-weight: 800; color: #1e293b; margin: 30px 0 15px; text-transform: uppercase; }
-        .shake { animation: shakeAnim 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shakeAnim { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
         
         .form-label { font-size: 12px; font-weight: 700; color: #64748b; display: block; margin-bottom: 6px; }
         .form-input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; }
@@ -122,10 +120,10 @@
             
             <div style="display: flex; gap: 10px; align-items: center;">
                 <a id="pdfOpenTab" href="#" target="_blank" class="btn" style="background: rgba(255,255,255,0.1); color: white; padding: 6px 15px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2);">
-                    <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i> Buka Tab
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="margin-right: 5px;"></i> Buka Tab
                 </a>
                 <a id="pdfDownload" href="#" target="_blank" class="btn" style="background: #2563eb; color: white; padding: 6px 15px; font-size: 12px;">
-                    <i class="fa-solid fa-download mr-2"></i> Muat Turun
+                    <i class="fa-solid fa-download" style="margin-right: 5px;"></i> Muat Turun
                 </a>
                 <button onclick="closePdfModal()" style="background: none; border: none; color: #9aa0a6; font-size: 24px; cursor: pointer; margin-left: 10px; line-height: 1;">×</button>
             </div>
@@ -141,7 +139,7 @@
 </div>
 
 <script>
-// Daftarkan plugin Datalabels secara global
+// Pendaftaran global untuk Datalabels
 Chart.register(ChartDataLabels);
 
 let userRole = 'guest'; 
@@ -154,19 +152,10 @@ let searchTerm = '';
 let filterStatus = '';
 let charts = {};
 let lastUpdated = null;
-
 let sortColumn = 'no'; 
 let sortAscending = true; 
 
-try {
-    const cachedData = localStorage.getItem('pps_students');
-    if (cachedData) {
-        students = JSON.parse(cachedData) || [];
-    }
-} catch (e) {
-    students = []; 
-}
-
+// Fungsi Notifikasi Toast
 function showNotification(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     if(!container) return;
@@ -183,6 +172,7 @@ function showNotification(message, type = 'info') {
     setTimeout(() => { toast.remove(); }, 4000);
 }
 
+// Tutup modal menggunakan kekunci Escape
 window.addEventListener('keydown', function(event) {
     if (event.key === 'Escape' || event.keyCode === 27) {
         const modals = document.querySelectorAll('.modal');
@@ -194,6 +184,7 @@ window.addEventListener('keydown', function(event) {
     }
 });
 
+// Verifikasi Identiti Pengguna dari Google Apps Script
 function checkGoogleIdentity() {
     if (typeof google !== 'undefined' && google.script) {
         google.script.run
@@ -203,32 +194,35 @@ function checkGoogleIdentity() {
                     userEmail = result.email;
                     render();
                     if (userRole === 'admin') {
-                        showNotification('Akses Pentadbir disahkan secara terbina (' + userEmail + ').', 'success');
+                        showNotification('Akses Pentadbir disahkan (' + userEmail + ').', 'success');
                     } else {
-                        showNotification('Akses Hanya Baca UniSZA disahkan (' + userEmail + ').', 'info');
+                        showNotification('Akses Hanya Baca disahkan (' + userEmail + ').', 'info');
                     }
                 }
             })
             .withFailureHandler(function(err) {
-                showNotification('Gagal membuat verifikasi SSO Google.', 'error');
+                showNotification('Gagal membuat verifikasi Google SSO.', 'error');
             })
             .verifyUserAccess();
     } else {
+        // Fallback jika dibuka selain dari persekitaran Apps Script
         userRole = 'admin';
-        userEmail = 'staf@unisza.edu.my';
-        showNotification('Akses Pentadbir disimulasikan (Local Preview).', 'success');
+        userEmail = 'simulasi@unisza.edu.my';
+        showNotification('Akses disimulasikan (Local Preview).', 'success');
         render();
     }
 }
 
+// Semak Kebenaran Admin Sebelum Membuka Fungsi Sensitif
 window.requireAdmin = (actionFunction) => {
     if (userRole === 'admin') {
         if (actionFunction) actionFunction();
     } else {
-        showNotification('Tindakan ini memerlukan kebenaran Akses Pentadbir PPS. E-mel anda: ' + userEmail, 'error');
+        showNotification('Tindakan ini memerlukan kebenaran Akses Pentadbir.', 'error');
     }
 };
 
+// Tarik Maklumat dari Spreadsheet RMC
 async function fetchDataFromSheet() {
     isLoadingData = true; 
     statusMessage = "Sedang menyegerak data dari spreadsheet...";
@@ -239,9 +233,6 @@ async function fetchDataFromSheet() {
             .withSuccessHandler(function(data) {
                 students = data || [];
                 lastUpdated = new Date();
-                try {
-                    localStorage.setItem('pps_students', JSON.stringify(students));
-                } catch(e) {}
                 showNotification('Data berjaya disegerak dari spreadsheet.', 'success');
                 isLoadingData = false; 
                 render();
@@ -257,19 +248,24 @@ async function fetchDataFromSheet() {
             loadMockData();
             isLoadingData = false;
             render();
-        }, 800);
+        }, 1000);
     }
 }
 
 function loadMockData() {
     students = [
-        { "no": "Test1", "matric": "A/0888", "nama": "NUR QURRATU AINI JANNAH BINTI NASARUDDIN", "emel": "pelajar@test.com", "rmcSession": "Semester II Session 2025/2026", "certId": "RMC26-001", "status": "Test Emailed", "category": "SCIENCE", "examMarks": "30", "assignMarks": "42", "totalMarks": "72", "statusSijil": "Lulus", "faculty": "FBIM", "supervisor": "DR. AHMAD NAORAS BITAR", "gradCoord": "DR. NUR FATIN HANNANI BINTI IMRAN", "facultyPic": "DR. FAIRUZ BINTI MOHD NASIR" }
+        { "no": "Test1", "matric": "S9999", "nama": "NAMA PELAJAR TEST", "emel": "pelajar@test.com", "rmcSession": "Sesi Test", "certId": "TEST-001", "status": "Pending", "category": "SCIENCE", "examMarks": "30", "assignMarks": "42", "totalMarks": "72", "statusSijil": "Lulus", "faculty": "FBIM", "supervisor": "DR. SUPERVISOR TEST", "gradCoord": "DR. COORD TEST", "facultyPic": "DR. PIC TEST" }
     ];
     lastUpdated = new Date();
 }
 
+// Proses Penjanaan Sijil (Ujian & Sebenar) Menggunakan SweetAlert2
 function triggerCertificateProcess(mode, selectedMatrics = []) {
     const isTest = mode === 'test';
+    
+    if (document.getElementById('confirmModal')) {
+        document.getElementById('confirmModal').style.display = 'none';
+    }
     
     Swal.fire({
         title: isTest ? 'Sedang Menjana Sijil (Ujian)...' : 'Sedang Menjana Sijil Sebenar...',
@@ -309,20 +305,12 @@ function triggerCertificateProcess(mode, selectedMatrics = []) {
                 title: 'Simulasi Selesai!',
                 text: `[Mod ${mode.toUpperCase()}] Sijil berjaya diproses (Local Preview).`
              });
-             if(mode === 'actual' && selectedMatrics.length > 0) {
-                 selectedMatrics.forEach(m => {
-                     let s = students.find(x => x.matric === m);
-                     if(s) s.status = 'Emailed';
-                 });
-                 try {
-                     localStorage.setItem('pps_students', JSON.stringify(students));
-                 } catch(e) {}
-             }
              render();
          }, 2000);
     }
 }
 
+// URUS ADMIN
 window.openAdminModal = () => {
     document.getElementById('adminModal').style.display = 'flex';
     document.getElementById('adminListArea').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin text-blue-600"></i> Memuat turun senarai admin...</div>';
@@ -338,7 +326,7 @@ window.openAdminModal = () => {
             })
             .getAdminsWeb();
     } else {
-        adminList = ['admin@unisza.edu.my', 'pps_gs-academic@unisza.edu.my'];
+        adminList = ['admin@unisza.edu.my'];
         setTimeout(renderAdminListHtml, 500);
     }
 };
@@ -349,7 +337,7 @@ window.renderAdminListHtml = () => {
         html += `
         <div class="admin-list-item">
             <span style="font-weight:600; color:#1e293b;">${escapeHtml(email)}</span>
-            <button class="btn btn-danger" style="padding: 5px 10px; font-size:11px;" onclick="removeAdminAction('${escapeHtml(email)}')"><i class="fa-solid fa-trash"></i> Buang</button>
+            <button class="btn btn-danger" style="padding: 5px 10px; font-size:11px;" onclick="removeAdminAction('${escapeHtml(email)}')"><i class="fa-solid fa-trash" style="margin-right: 5px;"></i> Buang</button>
         </div>`;
     });
     document.getElementById('adminListArea').innerHTML = html;
@@ -404,6 +392,7 @@ window.removeAdminAction = (email) => {
     }
 };
 
+// MAKLUMAT TERPERINCI PELAJAR
 window.openDetailsModal = (matricVal) => {
     const student = students.find(s => s.matric === matricVal);
     if(!student) return;
@@ -430,8 +419,8 @@ window.openDetailsModal = (matricVal) => {
         actionContainer.innerHTML = `
             <div class="details-label">TINDAKAN SIJIL</div>
             <div class="details-value" style="border:none; padding-bottom:0; padding-top:2px;">
-                <button class="btn btn-info" style="padding: 6px 12px; font-size:12px; background-color: #10b981; border: none;" onclick="openPdfModal('${escapeHtml(student.matric)}')">
-                    <i class="fa-solid fa-file-pdf mr-2"></i> Papar Sijil
+                <button class="btn btn-success" style="padding: 6px 12px; font-size:12px; border: none;" onclick="openPdfModal('${escapeHtml(student.matric)}')">
+                    <i class="fa-solid fa-file-pdf" style="margin-right: 5px;"></i> Papar Sijil
                 </button>
             </div>
         `;
@@ -440,6 +429,7 @@ window.openDetailsModal = (matricVal) => {
     }
 };
 
+// KEMASKINI MAKLUMAT (EDIT PELAJAR)
 window.openEditModal = (matricVal) => {
     const student = students.find(s => s.matric === matricVal);
     if(!student) return;
@@ -482,9 +472,6 @@ window.saveEditData = async () => {
             .withSuccessHandler(function(result) {
                 showNotification('Rekod berjaya dikemaskini dalam spreadsheet.', 'success');
                 students[studentIndex] = Object.assign(students[studentIndex], updatedData);
-                try {
-                    localStorage.setItem('pps_students', JSON.stringify(students));
-                } catch(e) {}
                 document.getElementById('editModal').style.display = 'none';
                 render();
             })
@@ -497,9 +484,6 @@ window.saveEditData = async () => {
     } else {
         setTimeout(() => {
             students[studentIndex] = Object.assign(students[studentIndex], updatedData);
-            try {
-                localStorage.setItem('pps_students', JSON.stringify(students));
-            } catch(e) {}
             document.getElementById('editModal').style.display = 'none';
             showNotification('Rekod berjaya dikemaskini (Simulasi).', 'success');
             render();
@@ -527,12 +511,13 @@ function getStatusCategory(statusStr) {
 }
 
 function getStatusBadgeHtml(cat, tooltip = '') {
-    if(cat === 'Emailed') return `<span class="badge badge-emailed"><i class="fa-solid fa-check mr-1"></i> Selesai Emel</span>`;
-    if(cat === 'Emel Ujian') return `<span class="badge badge-test"><i class="fa-solid fa-vial mr-1"></i> Emel Ujian</span>`;
-    if(cat === 'Error') return `<span class="badge badge-error" title="${escapeHtml(tooltip)}"><i class="fa-solid fa-circle-exclamation mr-1"></i> Ralat</span>`;
+    if(cat === 'Emailed') return `<span class="badge badge-emailed"><i class="fa-solid fa-check" style="margin-right:4px;"></i> Selesai Emel</span>`;
+    if(cat === 'Emel Ujian') return `<span class="badge badge-test"><i class="fa-solid fa-vial" style="margin-right:4px;"></i> Emel Ujian</span>`;
+    if(cat === 'Error') return `<span class="badge badge-error" title="${escapeHtml(tooltip)}"><i class="fa-solid fa-circle-exclamation" style="margin-right:4px;"></i> Ralat</span>`;
     return `<span class="badge badge-pending">Belum Diemel</span>`;
 }
 
+// MELUKIS CARTA (CHARTS)
 function renderCharts() {
     if(!students || students.length === 0) return;
 
@@ -562,6 +547,7 @@ function renderCharts() {
     }
 }
 
+// FUNGSI SORT TABLE (MENGISIH JADUAL)
 window.handleSort = (column) => {
     if (sortColumn === column) {
         sortAscending = !sortAscending; 
@@ -581,6 +567,7 @@ function getSortIconHtml(column) {
         : '<i class="fa-solid fa-sort-down sort-icon active"></i>';
 }
 
+// PENGHASILAN ANTARAMUKA UTAMA (RENDER)
 function render() {
     const app = document.getElementById('app');
     const scrollPos = window.scrollY || document.documentElement.scrollTop;
@@ -626,7 +613,7 @@ function render() {
             <div class="dashboard">
                 <div class="header">
                     <div class="header-left">
-                        <div class="header-logo-box"><img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" alt="Logo" class="header-logo"></div>
+                        <div class="header-logo-box"><img src="https://lh3.googleusercontent.com/d/1r-NvG4_QmZsUMM6SQl3U7gUz63Spkqx4" alt="Logo UniSZA" class="header-logo"></div>
                         <div class="header-text">
                             <h1>Kursus Research Methodology</h1>
                             <p>Maklumat Siswazah dan Status Sijil</p>
@@ -638,21 +625,21 @@ function render() {
                             Akses: ${isAdminUser ? 'Pentadbir' : 'Hanya Baca'}
                         </div>
                         <div style="font-size:11px; color:#475569; font-weight:600; margin-top:2px;">
-                            Sesi: <span class="text-blue-600">${userEmail}</span>
+                            Sesi: <span style="color:#2563eb;">${userEmail}</span>
                         </div>
                         
                         <div class="header-actions" style="margin-top:8px;">
                             <div style="display: flex; flex-direction: column; gap: 8px; align-items: stretch; max-width: 100%;">
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
-                                    <button class="btn btn-secondary" onclick="fetchDataFromSheet()"><i class="fa-solid fa-rotate"></i> Sync Data</button>
+                                    <button class="btn btn-secondary" onclick="fetchDataFromSheet()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i> Sync Data</button>
                                     ${isAdminUser ? `
-                                        <button class="btn btn-warning" onclick="requireAdmin(() => openConfirmModal('test'))"><i class="fa-solid fa-flask"></i> Mod Ujian</button>
-                                        <button class="btn btn-primary" onclick="requireAdmin(() => openSelectStudentsModal())"><i class="fa-solid fa-paper-plane"></i> Mod Sebenar</button>
-                                        <button class="btn btn-info" onclick="requireAdmin(() => window.open('https://docs.google.com/document/d/1gRxiBT8Z_6gtvyB5dwui4iQlznFMsOh1sfOkbcvO05k/edit?usp=drive_link', '_blank'))"><i class="fa-solid fa-certificate"></i> Template Sijil</button>
-                                        <button class="btn btn-secondary" onclick="requireAdmin(() => openAdminModal())"><i class="fa-solid fa-users-gear"></i> Urus Admin</button>
+                                        <button class="btn btn-warning" onclick="requireAdmin(() => openConfirmModal('test'))"><i class="fa-solid fa-flask" style="margin-right:6px;"></i> Mod Ujian</button>
+                                        <button class="btn btn-primary" onclick="requireAdmin(() => openSelectStudentsModal())"><i class="fa-solid fa-paper-plane" style="margin-right:6px;"></i> Mod Sebenar</button>
+                                        <button class="btn btn-secondary" onclick="requireAdmin(() => window.open('https://docs.google.com/document/d/1gRxiBT8Z_6gtvyB5dwui4iQlznFMsOh1sfOkbcvO05k/edit', '_blank'))"><i class="fa-solid fa-certificate" style="margin-right:6px;"></i> Template Sijil</button>
+                                        <button class="btn btn-secondary" onclick="requireAdmin(() => openAdminModal())"><i class="fa-solid fa-users-gear" style="margin-right:6px;"></i> Urus Admin</button>
                                     ` : ''}
                                 </div>
-                                <button class="btn btn-success" onclick="downloadPDF()"><i class="fa-solid fa-file-pdf"></i> PDF Laporan</button>
+                                <button class="btn btn-success" onclick="downloadPDF()"><i class="fa-solid fa-file-pdf" style="margin-right:6px;"></i> Muat Turun PDF Laporan</button>
                             </div>
                         </div>
                         
@@ -714,7 +701,7 @@ function render() {
                             </tr>
                         </thead>
                         <tbody>${filtered.length ? filtered.map((l,i)=>`
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
                                 <td>${escapeHtml(l.no)}</td>
                                 <td style="font-family: monospace; color:#64748b;">${escapeHtml(l.matric)}</td>
                                 <td><a href="#" onclick="openDetailsModal('${escapeHtml(l.matric)}'); return false;" style="color:#2563eb; text-decoration:none; font-weight:700;">${escapeHtml(l.nama)}</a></td>
@@ -848,7 +835,7 @@ function render() {
                     <label class="form-label">FAKULTI</label><input type="text" id="editFaculty" class="form-input">
                     <label class="form-label">NO SIJIL</label><input type="text" id="editCertId" class="form-input">
                     <label class="form-label">STATUS</label><input type="text" id="editStatus" class="form-input">
-                    <div id="editModalLoading" style="display:none; text-align:center; padding:15px 0;"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600 mb-2"></i><p>Menyimpan rekod...</p></div>
+                    <div id="editModalLoading" style="display:none; text-align:center; padding:15px 0;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: #2563eb; margin-bottom: 8px;"></i><p>Menyimpan rekod...</p></div>
                     <div id="editModalBtns" style="display:flex; gap:12px; margin-top: 10px;">
                         <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('editModal').style.display='none'">Batal</button>
                         <button class="btn btn-primary" style="flex:1;" onclick="saveEditData()">Simpan</button>
@@ -891,7 +878,7 @@ window.openSelectStudentsModal = () => {
     } else {
         pendingStudents.forEach(s => {
             listContainer.innerHTML += `
-                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                <tr style="border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
                     <td style="padding:10px; text-align:center;"><input type="checkbox" class="student-cb" value="${escapeHtml(s.matric)}" onchange="updateSelectedCount()"></td>
                     <td style="padding:10px; font-family:monospace; color:#64748b;">${escapeHtml(s.matric)}</td>
                     <td style="padding:10px; font-weight:600; color:#1e293b;">${escapeHtml(s.nama)}</td>
@@ -961,7 +948,7 @@ window.downloadPDF = () => {
     });
 };
 
-// --- PDF VIEW LOGIC ---
+// --- PEMAPAR PDF ---
 window.openPdfModal = (matric) => {
     const modal = document.getElementById('pdfModal');
     const iframe = document.getElementById('pdfIframe');
@@ -1033,6 +1020,7 @@ window.closePdfModal = () => {
     document.getElementById('pdfIframe').src = "";
 };
 
+// PELANCARAN SISTEM
 render();
 checkGoogleIdentity();
 fetchDataFromSheet();
