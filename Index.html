@@ -139,6 +139,11 @@
 </div>
 
 <script>
+// Nilai disuntik daripada Script Properties pelayan GAS
+var _simulatedUserEmail = "<?= simulatedUserEmail ?>";
+var _mockAdminEmail = "<?= mockAdminEmail ?>";
+function _isInjected(val) { return val && val.indexOf('@') !== -1 && val.indexOf('<?') === -1; }
+
 // Pendaftaran global untuk Datalabels
 Chart.register(ChartDataLabels);
 
@@ -207,7 +212,7 @@ function checkGoogleIdentity() {
     } else {
         // Fallback jika dibuka selain dari persekitaran Apps Script
         userRole = 'admin';
-        userEmail = 'simulasi@unisza.edu.my';
+        userEmail = _isInjected(_simulatedUserEmail) ? _simulatedUserEmail : 'pengguna@contoh.com';
         showNotification('Akses disimulasikan (Local Preview).', 'success');
         render();
     }
@@ -326,7 +331,7 @@ window.openAdminModal = () => {
             })
             .getAdminsWeb();
     } else {
-        adminList = ['admin@unisza.edu.my'];
+        adminList = [_isInjected(_mockAdminEmail) ? _mockAdminEmail : 'admin@contoh.com'];
         setTimeout(renderAdminListHtml, 500);
     }
 };
@@ -732,7 +737,7 @@ function render() {
                 <div style="padding: 20px 32px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                     <label class="form-label">TAMBAH EMEL PENTADBIR BAHARU</label>
                     <div style="display:flex; gap:10px;">
-                        <input type="email" id="newAdminEmail" class="form-input" style="margin-bottom:0;" placeholder="Contoh: staf@unisza.edu.my">
+                        <input type="email" id="newAdminEmail" class="form-input" style="margin-bottom:0;" placeholder="Contoh: admin@contoh.com">
                         <button class="btn btn-primary" onclick="addAdminAction()">Tambah</button>
                     </div>
                 </div>

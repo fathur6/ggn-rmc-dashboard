@@ -15,19 +15,24 @@ const TEMPLATE_ID = PropertiesService.getScriptProperties().getProperty('TEMPLAT
  * Memaparkan halaman utama (Index.html) semasa dibuka untuk semua warga UniSZA.
  */
 function doGet(e) {
-  try {
-    return HtmlService.createTemplateFromFile('Index')
+  const props = PropertiesService.getScriptProperties();
+  
+  function serveTemplate(fileName) {
+    const template = HtmlService.createTemplateFromFile(fileName);
+    template.simulatedUserEmail = props.getProperty('SIMULATED_USER_EMAIL') || '';
+    template.mockAdminEmail = props.getProperty('MOCK_ADMIN_EMAIL') || '';
+    return template
       .evaluate()
       .setTitle('Kursus Research Methodology')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
+
+  try {
+    return serveTemplate('Index');
   } catch (err) {
     try {
-      return HtmlService.createTemplateFromFile('Index.html')
-        .evaluate()
-        .setTitle('Kursus Research Methodology')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+      return serveTemplate('Index.html');
     } catch (err2) {
       return HtmlService.createHtmlOutput("<p>Ralat kritikal: Fail Index gagal dimuatkan.</p>");
     }
@@ -389,7 +394,7 @@ function processCertificates(isTestMode, selectedMatrics) {
     return { success: 0, error: 1, message: "Sistem belum dikonfigurasi. Sila semak Script Properties." };
   }
   
-  const FROM_EMAIL = PropertiesService.getScriptProperties().getProperty('FROM_EMAIL') || 'no-reply@unisza.edu.my'; 
+  const FROM_EMAIL = PropertiesService.getScriptProperties().getProperty('FROM_EMAIL') || 'no-reply@contoh.com'; 
   
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName("RMC");
